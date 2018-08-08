@@ -1,0 +1,21 @@
+{
+  "name": "bitlyclone",
+  "version": "1.0.0",
+  "description": "a bitly url shortener project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "cool"
+  ],
+  "author": "William Kasurak",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "ejs": "^1.0.0",
+    "express": "^4.6.1",
+    "nodemon": "^1.18.3"
+  },
+  "devDependencies": {}
+}

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>TinyApp</title>
+  <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+<body>
+
+  <% include partials/_header %>
+    <!-- Add your EJS code here -->
+
+  <% for (id in urls) { %>
+    <li>
+      <h3> <%= urls[id] %> </h3>
+      <!-- <a href="/urls/<%=id%>">Edit URL</a> -->
+      <form method="POST" action="/urls/<%=id%>/delete">
+        <a href="urls/<%=id%>"> Edit ME</a>
+      <button type="submit">DELETE</button>
+      </form>
+</li>
+  <% }; %>
+
+  <br>
+  <h3><a href="urls/new"> create new tiny url</a></h3>
+</body>
+</html>
