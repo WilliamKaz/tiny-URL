@@ -1,3 +1,14 @@
 <header>
-  <h1>BIG TEXT</h1>
-</header>
+  SMOL URL
+  <% if(userName){ %>
+  <form method ='post' action ='/logout'>
+    <div> <%= userName %> </div>
+    <button>logout</button>
+  </form>
+  <% } else{ %>
+      <form method="POST" action="/login">
+      <label for="userName"> User Name </label>
+      <input type='text' name="userName"></input>
+      <input type="submit" value="Submit">
+  <% } %>
+</form>
