@@ -85,8 +85,9 @@ function generateRandomString() {
   // https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
   var text = "";
   var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  for (var i = 0; i < 5; i++)
+  for (var i = 0; i < 6; i++){
     text += possible.charAt(Math.floor(Math.random() * possible.length));
+  }
   return text;
   // other persons code ends here
 
