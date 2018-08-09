@@ -10,18 +10,27 @@
 
     <!-- Add your EJS code here -->
 
-  <% for (id in urls) { %>
-    <li>
-      <h3> <%= urls[id] %> </h3>
-      <!-- <a href="/urls/<%=id%>">Edit URL</a> -->
+ <ul>
+    <% if(isLoggedIn === true){%>
+    <% for (id in urls) { %>
+
+      <% if(user.user_Id == urls[id].user_Id){  %>
+      <li>
+       <h3> <%= urls[id].longURL %> </h3>
       <form method="POST" action="/urls/<%=id%>/delete">
+
         <a href="urls/<%=id%>"> Edit ME</a>
       <button type="submit">DELETE</button>
       </form>
-</li>
-  <% }; %>
+      </li>
+      <% } %>
 
+  <% }; %>
+  <ul>
   <br>
-  <h3><a href="urls/new"> create new tiny url</a></h3>
+    <h3><a href="urls/new"> create new tiny url</a></h3>
+  <%}%>
+
+
 </body>
 </html>

@@ -16,21 +16,20 @@ app.set("view engine", "ejs");
 
 
 var urlDatabase = {
-  // "b2xVn2": "http://www.lighthouselabs.ca",
-  // "9sm5xK": "http://www.google.com"
+
 };
 
 const users = {
-  "userRandomID": {
-    id: "userRandomID",
-    email: "user@example.com",
-    password: "purple-monkey-dinosaur"
-  },
- "user2RandomID": {
-    id: "user2RandomID",
-    email: "user2@example.com",
-    password: "dishwasher-funk"
-  }
+ //  "userRandomID": {
+ //    id: "userRandomID",
+ //    email: "user@example.com",
+ //    password: "purple-monkey-dinosaur"
+ //  },
+ // "user2RandomID": {
+ //    id: "user2RandomID",
+ //    email: "user2@example.com",
+ //    password: "dishwasher-funk"
+ //  }
 }
 
 app.listen(PORT, () => {
@@ -79,7 +78,7 @@ app.get('/login', (req, res) => {
 
 
 app.get("/u/:shortURL", (req, res) => {
-  let longURL = urlDatabase[req.params.shortURL];
+  let longURL = urlDatabase[req.params.shortURL].longURL;
   res.redirect(longURL);
 });
 
@@ -91,7 +90,7 @@ app.get("/urls/:id", (req, res) => {
     isLoggedIn = true;
     user = users[ req.cookies.user_Id];
   }
-  let templateVars = { shortURL: req.params.id, longURL: urlDatabase[req.params.id], user: user, isLoggedIn : isLoggedIn};
+  let templateVars = { shortURL: req.params.id, longURL: urlDatabase[req.params.id].longURL, user: user, isLoggedIn : isLoggedIn};
   res.render("urls_show", templateVars);
 });
 // get functions end
@@ -100,7 +99,7 @@ app.get("/urls/:id", (req, res) => {
 
 app.post("/urls", (req, res) => {
   var newId = generateRandomString(5);
-  urlDatabase[newId] = req.body.longURL;
+  urlDatabase[newId] = {longURL : req.body.longURL, user_Id: req.cookies.user_Id };
   console.log(urlDatabase);
   res.redirect(`/urls/${newId}`);
 });
@@ -112,7 +111,7 @@ app.post("/urls/:id/delete", (req, res) => {
 
 app.post("/urls/:id", (req, res) =>{
   var updateID =  req.params.id;
-  urlDatabase[updateID] = req.body.longURL;
+  urlDatabase[updateID] = {longURL : req.body.longURL, user_Id: req.cookies.user_Id };
   res.redirect('/urls/' + updateID);
 });
 
