@@ -20,19 +20,63 @@ var urlDatabase = {
   // "9sm5xK": "http://www.google.com"
 };
 
+const users = {
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk"
+  }
+}
+
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
+
+// get functions
+
 app.get("/urls/new", (req, res) => {
-  let templateVars = {userName: req.cookies['userName']}
+  let isLoggedIn = false;
+  let user = null;
+  if(req.cookies.user_Id){
+    isLoggedIn = true;
+    user = users[ req.cookies.user_Id];
+  }
+  let templateVars = {user: user, isLoggedIn : isLoggedIn}
   res.render("urls_new", templateVars);
 });
 
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase, userName: req.cookies['userName'] };
+   let isLoggedIn = false;
+   let user = null;
+  if(req.cookies.user_Id){
+    isLoggedIn = true;
+    user = users[ req.cookies.user_Id];
+  }
+  let templateVars = { urls: urlDatabase, user: user, isLoggedIn : isLoggedIn};
   res.render("urls_index", templateVars);
 });
+
+app.get('/register', (req, res) => {
+   let isLoggedIn = false;
+   let user = null;
+  if(req.cookies.user_Id){
+    isLoggedIn = true;
+    user = users[ req.cookies.user_Id];
+  }
+  let templateVars = {user: user, isLoggedIn : isLoggedIn};
+  res.render('urls_register', templateVars);
+});
+app.get('/login', (req, res) => {
+  let templateVars = {users: users};
+  res.render('urls_login', templateVars);
+});
+
 
 app.get("/u/:shortURL", (req, res) => {
   let longURL = urlDatabase[req.params.shortURL];
@@ -41,13 +85,21 @@ app.get("/u/:shortURL", (req, res) => {
 
 
 app.get("/urls/:id", (req, res) => {
-  let templateVars = { shortURL: req.params.id, longURL: urlDatabase[req.params.id], userName: req.cookies['userName']};
+   let isLoggedIn = false;
+   let user = null;
+  if(req.cookies.user_Id){
+    isLoggedIn = true;
+    user = users[ req.cookies.user_Id];
+  }
+  let templateVars = { shortURL: req.params.id, longURL: urlDatabase[req.params.id], user: user, isLoggedIn : isLoggedIn};
   res.render("urls_show", templateVars);
 });
+// get functions end
 
+// post functions
 
 app.post("/urls", (req, res) => {
-  var newId = generateRandomString();
+  var newId = generateRandomString(5);
   urlDatabase[newId] = req.body.longURL;
   console.log(urlDatabase);
   res.redirect(`/urls/${newId}`);
@@ -65,32 +117,59 @@ app.post("/urls/:id", (req, res) =>{
 });
 
 app.post('/login', (req,res) =>{
-  res.cookie('userName', req.body.userName);
-  res.redirect('/urls');
+   if(req.body.email === "" || req.body.password == ""){
+     return res.status(403).send("Please fill both fields");
+  } else{
+    for(id in users ){
+      if(req.body.email === users[id].email && req.body.password === users[id].password ){
+        res.cookie('user_Id', id);
+        res.redirect('/urls');
+        return;
+      }
+    }
+    return res.status(403).send("Error 303 user not found");
+  }
 });
 
 app.post('/logout', (req,res) =>{
-  res.clearCookie('userName');
+  res.clearCookie('user_Id');
   res.redirect('/urls');
 });
 
+app.post('/register', (req, res) =>{
+  var newUserId = 'User' + generateRandomString(7).toString();
+
+
+  if(req.body.email === "" || req.body.password == ""){
+     return res.status(400).send("Please fill both fields");
+  } else{
+    for(id in users ){
+      if(req.body.email == users[id].email){
+        console.log(users);
+        return res.status(400).send('Error: email is used by another user');
+      }
+    }
+    users[newUserId] = { id: newUserId, email: req.body.email , password: req.body.password };
+    res.cookie('user_Id',newUserId);
+    res.redirect('/urls');
+  }
+});
+
+// post functions end
 
 
 
-
-// needs to add functionality in a for loop of the database that determines if the short url as been used
-function generateRandomString() {
-  // used a stack overflow response to expedite writing this just
-  // changed the length in the for loop to suit the implementation
-  // https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
+// used a stack overflow response to expedite writing this just
+// changed the length in the for loop to suit the implementation
+// https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
+function generateRandomString(num) {
   var text = "";
   var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  for (var i = 0; i < 6; i++){
+  for (var i = 0; i < num; i++){
     text += possible.charAt(Math.floor(Math.random() * possible.length));
   }
   return text;
-  // other persons code ends here
-
+}
+// other persons code ends here
 // this solion limits us to a limited number of available small urls based on the number of letters 26 * 2  and numbers 1-9
 
-}
