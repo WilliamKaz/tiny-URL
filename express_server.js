@@ -1,10 +1,18 @@
 const bodyParser = require("body-parser");
 var express = require("express");
-var cookieParser = require('cookie-parser')
+var cookieSession = require('cookie-session');
+const bcrypt = require('bcryptjs');
 var app = express();
 var PORT = 8080;
 
-app.use(cookieParser())
+app.use(cookieSession({
+  name: 'session',
+  keys: ['qwerty123456'],
+
+  // Cookie Options
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}))
+
 
 app.use(express.static(__dirname + '/public'));
 
@@ -20,11 +28,11 @@ var urlDatabase = {
 };
 
 const users = {
- //  "userRandomID": {
- //    id: "userRandomID",
- //    email: "user@example.com",
- //    password: "purple-monkey-dinosaur"
- //  },
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur"
+  },
  // "user2RandomID": {
  //    id: "user2RandomID",
  //    email: "user2@example.com",
@@ -53,9 +61,9 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls", (req, res) => {
    let isLoggedIn = false;
    let user = null;
-  if(req.cookies.user_Id){
+  if(req.session.user_Id){
     isLoggedIn = true;
-    user = users[ req.cookies.user_Id];
+    user = users[ req.session.user_Id];
   }
   let templateVars = { urls: urlDatabase, user: user, isLoggedIn : isLoggedIn};
   res.render("urls_index", templateVars);
@@ -64,9 +72,9 @@ app.get("/urls", (req, res) => {
 app.get('/register', (req, res) => {
    let isLoggedIn = false;
    let user = null;
-  if(req.cookies.user_Id){
+  if(req.session.user_Id){
     isLoggedIn = true;
-    user = users[ req.cookies.user_Id];
+    user = users[ req.session.user_Id];
   }
   let templateVars = {user: user, isLoggedIn : isLoggedIn};
   res.render('urls_register', templateVars);
@@ -86,9 +94,9 @@ app.get("/u/:shortURL", (req, res) => {
 app.get("/urls/:id", (req, res) => {
    let isLoggedIn = false;
    let user = null;
-  if(req.cookies.user_Id){
+  if(req.session.user_Id){
     isLoggedIn = true;
-    user = users[ req.cookies.user_Id];
+    user = users[ req.session.user_Id];
   }
   let templateVars = { shortURL: req.params.id, longURL: urlDatabase[req.params.id].longURL, user: user, isLoggedIn : isLoggedIn};
   res.render("urls_show", templateVars);
@@ -99,7 +107,7 @@ app.get("/urls/:id", (req, res) => {
 
 app.post("/urls", (req, res) => {
   var newId = generateRandomString(5);
-  urlDatabase[newId] = {longURL : req.body.longURL, user_Id: req.cookies.user_Id };
+  urlDatabase[newId] = {longURL : req.body.longURL, user_Id: req.session.user_Id };
   console.log(urlDatabase);
   res.redirect(`/urls/${newId}`);
 });
@@ -111,7 +119,7 @@ app.post("/urls/:id/delete", (req, res) => {
 
 app.post("/urls/:id", (req, res) =>{
   var updateID =  req.params.id;
-  urlDatabase[updateID] = {longURL : req.body.longURL, user_Id: req.cookies.user_Id };
+  urlDatabase[updateID] = {longURL : req.body.longURL, user_Id: req.session.user_Id };
   res.redirect('/urls/' + updateID);
 });
 
@@ -120,8 +128,8 @@ app.post('/login', (req,res) =>{
      return res.status(403).send("Please fill both fields");
   } else{
     for(id in users ){
-      if(req.body.email === users[id].email && req.body.password === users[id].password ){
-        res.cookie('user_Id', id);
+      if(req.body.email === users[id].email && bcrypt.compareSync(req.body.password, users[id].password )){
+        req.session.user_Id = (id);
         res.redirect('/urls');
         return;
       }
@@ -131,7 +139,7 @@ app.post('/login', (req,res) =>{
 });
 
 app.post('/logout', (req,res) =>{
-  res.clearCookie('user_Id');
+  req.session.user_Id = null;
   res.redirect('/urls');
 });
 
@@ -148,10 +156,11 @@ app.post('/register', (req, res) =>{
         return res.status(400).send('Error: email is used by another user');
       }
     }
-    users[newUserId] = { id: newUserId, email: req.body.email , password: req.body.password };
-    res.cookie('user_Id',newUserId);
+    users[newUserId] = { id: newUserId, email: req.body.email , password: bcrypt.hashSync(req.body.password, 10) };
+    req.session.user_Id = newUserId;
     res.redirect('/urls');
   }
+
 });
 
 // post functions end
@@ -161,7 +170,7 @@ app.post('/register', (req, res) =>{
 // used a stack overflow response to expedite writing this just
 // changed the length in the for loop to suit the implementation
 // https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
-function generateRandomString(num) {
+var generateRandomString = function(num) {
   var text = "";
   var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   for (var i = 0; i < num; i++){
@@ -171,4 +180,9 @@ function generateRandomString(num) {
 }
 // other persons code ends here
 // this solion limits us to a limited number of available small urls based on the number of letters 26 * 2  and numbers 1-9
+var encrypt = function(){
 
+}
+var decrypt = function(){
+
+}

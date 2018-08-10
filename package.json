@@ -12,8 +12,10 @@
   "author": "William Kasurak",
   "license": "UNLICENSED",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",
     "cookie-parser": "^1.4.3",
+    "cookie-session": "^2.0.0-beta.3",
     "ejs": "^1.0.0",
     "express": "^4.6.1",
     "nodemon": "^1.18.3"
