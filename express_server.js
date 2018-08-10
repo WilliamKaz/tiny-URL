@@ -5,6 +5,8 @@ const bcrypt = require('bcryptjs');
 var app = express();
 var PORT = 8080;
 
+
+
 app.use(cookieSession({
   name: 'session',
   keys: ['qwerty123456'],
@@ -19,8 +21,6 @@ app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.urlencoded({extended: true}));
 
 app.set("view engine", "ejs");
-
-// app.get()
 
 
 var urlDatabase = {
@@ -50,9 +50,11 @@ app.listen(PORT, () => {
 app.get("/urls/new", (req, res) => {
   let isLoggedIn = false;
   let user = null;
-  if(req.cookies.user_Id){
+  if(req.session.user_Id){
     isLoggedIn = true;
-    user = users[ req.cookies.user_Id];
+    user = users[ req.session.user_Id];
+  } else{
+    res.redirect("/login");
   }
   let templateVars = {user: user, isLoggedIn : isLoggedIn}
   res.render("urls_new", templateVars);
@@ -63,10 +65,12 @@ app.get("/urls", (req, res) => {
    let user = null;
   if(req.session.user_Id){
     isLoggedIn = true;
-    user = users[ req.session.user_Id];
+    user = users[req.session.user_Id];
   }
   let templateVars = { urls: urlDatabase, user: user, isLoggedIn : isLoggedIn};
-  res.render("urls_index", templateVars);
+   console.log(templateVars);
+   console.log(req.session);
+    res.render("urls_index", templateVars);
 });
 
 app.get('/register', (req, res) => {
@@ -80,7 +84,13 @@ app.get('/register', (req, res) => {
   res.render('urls_register', templateVars);
 });
 app.get('/login', (req, res) => {
-  let templateVars = {users: users};
+  let isLoggedIn = false;
+   let user = null;
+  if(req.session.user_Id){
+    isLoggedIn = true;
+    user = users[ req.session.user_Id];
+  }
+  let templateVars = {user: user, isLoggedIn : isLoggedIn};
   res.render('urls_login', templateVars);
 });
 
@@ -101,6 +111,12 @@ app.get("/urls/:id", (req, res) => {
   let templateVars = { shortURL: req.params.id, longURL: urlDatabase[req.params.id].longURL, user: user, isLoggedIn : isLoggedIn};
   res.render("urls_show", templateVars);
 });
+
+app.get('*', (req, res) =>{
+  res.redirect('urls_404')
+});
+
+
 // get functions end
 
 // post functions
@@ -177,12 +193,4 @@ var generateRandomString = function(num) {
     text += possible.charAt(Math.floor(Math.random() * possible.length));
   }
   return text;
-}
-// other persons code ends here
-// this solion limits us to a limited number of available small urls based on the number of letters 26 * 2  and numbers 1-9
-var encrypt = function(){
-
-}
-var decrypt = function(){
-
 }

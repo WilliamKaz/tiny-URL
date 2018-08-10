@@ -1,10 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>TinyApp</title>
+  <title>Smol URL</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css?family=Do+Hyeon" rel="stylesheet">
   <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 <body>
+  <div class="wrapper">
 
   <% include partials/_header %>
 
@@ -12,25 +16,23 @@
 
  <ul>
     <% if(isLoggedIn === true){%>
-    <% for (id in urls) { %>
-
-      <% if(user.user_Id == urls[id].user_Id){  %>
+      <% for (id in urls) { %>
+        <% if(user.id == urls[id].user_Id){  %>
       <li>
-       <h3> <%= urls[id].longURL %> </h3>
-      <form method="POST" action="/urls/<%=id%>/delete">
-
-        <a href="urls/<%=id%>"> Edit ME</a>
-      <button type="submit">DELETE</button>
-      </form>
+        <form method="POST" action="/urls/<%=id%>/delete">
+          <h3> <%= urls[id].longURL %> </h3>
+          <a href="urls/<%=id%>"> Edit ME</a>
+        <button class="button" type="submit">DELETE</button>
+        </form>
       </li>
-      <% } %>
-
-  <% }; %>
+     <% } %>
+    <% }; %>
   <ul>
   <br>
-    <h3><a href="urls/new"> create new tiny url</a></h3>
+
   <%}%>
+  <h3><a href="urls/new"> create new tiny url</a></h3>
 
-
+</div>
 </body>
 </html>

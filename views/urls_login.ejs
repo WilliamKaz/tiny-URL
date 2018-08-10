@@ -1,22 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <title>Smol URL</title>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css?family=Do+Hyeon" rel="stylesheet">
    <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 <body>
-
+  <div class="wrapper">
+<% include partials/_header %>
  <form method="POST" action="/login">
    <div>
     <label for="email"> Email</label>
-    <input type='text' name="email"></input>
+    <input class="input" type='text' name="email"></input>
   </div>
   <div>
     <label for="password"> Password </label>
-    <input type='text' name="password"></input>
-    <input type="submit" value="Submit">
+    <input class="input" type='text' name="password"></input>
+    <input class="button" type="submit" value="Submit">
   </div>
 </form>
+
+</div>
 
 </body>
 </html>
